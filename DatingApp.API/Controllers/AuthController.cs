@@ -25,7 +25,7 @@ namespace DatingApp.API.Controllers
             this.config = config;
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegistrationDto user){
             //validate later
             user.username = user.username.ToLower();
