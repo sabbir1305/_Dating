@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Threading;
+using System.Net;
+using System.Text;
 using System.Transactions;
 using System.Net.Mime;
 using System;
@@ -17,6 +19,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using DatingApp.API.Helpers;
 
 namespace DatingApp.API
 {
@@ -60,6 +65,18 @@ namespace DatingApp.API
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
               //  app.UseHsts();
+              app.UseExceptionHandler(builder=>{
+                    builder.Run(async context=>{
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                        var error = context.Features.Get<IExceptionHandlerFeature>();
+                        if(error != null){
+
+                           context.Response.AddApplicationError(error.Error.Message); 
+                            await context.Response.WriteAsync(error.Error.Message);
+                        }
+                    });
+              });
             }
 
            // app.UseHttpsRedirection();
